@@ -1,0 +1,281 @@
+:root {
+  --bg-primary: #313338;
+  --bg-secondary: #2b2d31;
+  --bg-tertiary: #1e1f22;
+  
+  --text-primary: #f2f3f5;
+  --text-secondary: #b5bac1;
+  --text-muted: #949ba4;
+  
+  --accent-color: #5865f2;
+  --accent-hover: #4752c4;
+  --accent-active: #3c45a5;
+  
+  --hover-bg: rgba(255, 255, 255, 0.08);
+  --active-bg: rgba(255, 255, 255, 0.12);
+  
+  --border-radius-sm: 4px;
+  --border-radius-md: 8px;
+  --border-radius-lg: 12px;
+  
+  --transition-speed: 0.15s;
+
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color: var(--text-primary);
+  background-color: var(--bg-primary);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body, html, #root {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+#container {
+  display: flex;
+  height: 100%;
+  width: 100%;
+  background-color: var(--bg-primary);
+}
+
+#content-area {
+  flex: 1;
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+h1, h2, h3 {
+  color: var(--text-primary);
+  margin-top: 0;
+}
+
+/* Sidebar Styles */
+#sidebarWrapper {
+  width: 260px;
+  height: 100%;
+  background-color: var(--bg-secondary);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem 0.5rem;
+  gap: 0.25rem;
+  border-right: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+#sidebarWrapper button {
+  all: unset;
+  display: block;
+  width: calc(100% - 1rem); /* Ensures it stays inside with the 0.5rem side margins */
+  padding: 0.75rem 1rem;
+  margin: 0 0.5rem;
+  box-sizing: border-box; /* Critical: includes padding in width calculation */
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--border-radius-md);
+  transition: all var(--transition-speed) ease;
+  text-align: left;
+}
+
+#sidebarWrapper button:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
+}
+
+#sidebarWrapper button.active {
+  background-color: var(--active-bg);
+  color: var(--text-primary);
+}
+
+#sidebarWrapper button:active {
+  background-color: var(--active-bg);
+}
+
+/* General Button Styles */
+button.primary-btn {
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color var(--transition-speed) ease;
+}
+
+button.primary-btn:hover {
+  background-color: var(--accent-hover);
+}
+
+button.primary-btn:active {
+  background-color: var(--accent-active);
+}
+
+/* Modal Styles */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background-color: var(--bg-secondary);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  width: 100%;
+  max-width: 450px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  color: var(--text-primary);
+}
+
+.modal-content h2 {
+  margin-bottom: 1.5rem;
+  font-size: 1.25rem;
+}
+
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-row input {
+  flex: 1;
+  background-color: var(--bg-tertiary);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 0.6rem;
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+}
+
+.input-row input:focus {
+  outline: 1px solid var(--accent-color);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+}
+
+button.secondary-btn {
+  background: transparent;
+  color: var(--text-primary);
+  border: none;
+  padding: 0.6rem 1.2rem;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: var(--border-radius-sm);
+}
+
+button.secondary-btn:hover {
+  text-decoration: underline;
+}
+
+/* Folder List and Card Styles */
+.folder-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.folder-card {
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius-md);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  transition: transform var(--transition-speed) ease, background-color var(--transition-speed) ease;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.folder-card:hover {
+  background-color: var(--hover-bg);
+  transform: translateY(-2px);
+}
+
+.folder-icon {
+  color: var(--accent-color);
+  font-size: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-info {
+  flex: 1;
+  overflow: hidden;
+}
+
+.folder-path {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.folder-meta {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--text-muted);
+}
+
+.delete-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-muted);
+  padding: 0.5rem;
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-speed) ease;
+  opacity: 0;
+}
+
+.folder-card:hover .delete-btn {
+  opacity: 1;
+}
+
+.delete-btn:hover {
+  background-color: #f23f4220;
+  color: #f23f43;
+}
