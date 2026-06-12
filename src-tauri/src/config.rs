@@ -1,31 +1,26 @@
-use std::{fs, ops::Index};
+use std::{fs};
 use std::path::PathBuf;
 use serde::{Serialize, Deserialize};
 use tauri::Manager;
+use crate::folder::{Folder};
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppConfig {
-    download_paths: Vec<String>,
+    folders: Vec<Folder>,
 }
 
-impl AppConfig{
-    pub fn get_download_paths(&self) -> &Vec<String>{
-        &self.download_paths
+impl AppConfig {
+
+    pub fn add_folder(&mut self, path: String, id: String){
+        self.folders.push(Folder {
+            id: id,
+            path: path,
+            last_synchronized: None,
+        });
     }
 
-    pub fn with_additional_path(mut self, new_path: String) -> Self {
-        self.download_paths.push(new_path);
-        self
-    }
-
-    pub fn remove_path(mut self, path_to_remove : String) -> Self{
-        for (index,path) in self.get_download_paths().iter().enumerate() {
-            if path == &path_to_remove{
-                self.download_paths.remove(index);
-                break;
-            }  
-        };
-        self
+    pub fn remove_folder(&mut self, path: String, id : String){
+        self.folders.retain(|f| f.path != path && f.id != id);
     }
 }
 
@@ -40,7 +35,7 @@ fn get_config_file_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String
 }
 
 fn load_config(app_handle: &tauri::AppHandle) -> AppConfig {
-    let default_config = AppConfig { download_paths: Vec::new() };
+    let default_config = AppConfig { folders: Vec::new() };
 
     if let Ok(config_path) = get_config_file_path(&app_handle) {
         if config_path.exists() {
@@ -64,21 +59,28 @@ fn save_config(app_handle: &tauri::AppHandle, config: &AppConfig) -> Result<(), 
 }
 
 #[tauri::command]
-pub fn get_config_paths(app_handle: tauri::AppHandle) -> Vec<String>{
+pub fn get_folders(app_handle: tauri::AppHandle) -> Vec<Folder> {
     let config = load_config(&app_handle);
-    config.get_download_paths().clone()
+    config.folders
 }
 
 #[tauri::command]
-pub fn add_path_config(app_handle: tauri::AppHandle, path: String) -> Result<(), String> {
-    let config = load_config(&app_handle);
-    let new_config = config.with_additional_path(path);
-    save_config(&app_handle, &new_config)
+pub fn add_folder(app_handle: tauri::AppHandle, path: String, id : String) -> Result<(), String> {
+    let mut config = load_config(&app_handle);
+    config.add_folder(path, id);
+    save_config(&app_handle, &config)
 }
 
 #[tauri::command]
-pub fn remove_path_config(app_handle: tauri::AppHandle, path: String) -> Result<(),String>{
-    let config = load_config(&app_handle);
-    let new_config = config.remove_path(path);
-    save_config(&app_handle, &new_config)
+pub fn remove_folder(app_handle: tauri::AppHandle, path: String,id : String) -> Result<(), String> {
+    let mut config = load_config(&app_handle);
+    config.remove_folder(path, id);
+    save_config(&app_handle, &config)
+}
+
+#[tauri::command]
+pub fn reset_folders(app_handle: tauri::AppHandle) -> Result<(), String> {
+    let mut config = load_config(&app_handle);
+    config.folders.clear();
+    save_config(&app_handle, &config)
 }

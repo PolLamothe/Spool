@@ -4,10 +4,29 @@ export enum Page{
     Settings = "Settings"
 }
 
-export class Folder{
-    path : string;
+export interface RustFolder {
+    path: string;
+    id: string;
+    last_synchronized: string | null;
+}
 
-    constructor(path: string){
+export class Folder implements Folder {
+     
+    path: string;
+    id: string;
+    last_synchronized: Date;
+    
+    constructor(path: string,id: string,last_synchronized: Date) {
         this.path = path;
+        this.id = id;
+        this.last_synchronized = last_synchronized;
+    }
+
+    static fromRustFolder(f: RustFolder): Folder {
+        return new Folder(
+            f.path,
+            f.id,
+            f.last_synchronized ? new Date(f.last_synchronized) : new Date(0)
+        );
     }
 }

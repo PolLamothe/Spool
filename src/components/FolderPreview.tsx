@@ -9,7 +9,7 @@ interface FolderPreviewProps {
 function FolderPreview({ folder, onDelete }: FolderPreviewProps){
 
     async function deleteFolder(){
-        await invoke("remove_path_config", { path: folder.path });
+        await invoke("remove_folder", { path: folder.path, id: folder.id });
         onDelete();
     }
 
@@ -22,7 +22,8 @@ function FolderPreview({ folder, onDelete }: FolderPreviewProps){
             </div>
             <div className="folder-info">
                 <p className="folder-path">{folder.path}</p>
-                <p className="folder-meta">Local Folder</p>
+                <p className="folder-meta">ID: {folder.id}</p>
+                <p className="folder-meta">Last updated: {folder.last_synchronized.getTime() === 0 ? "Never" : folder.last_synchronized.toLocaleString()}</p>
             </div>
             <button className="delete-btn" title="Remove folder" onClick={deleteFolder}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">

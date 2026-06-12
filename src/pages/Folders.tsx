@@ -1,12 +1,16 @@
 import { useEffect, useState } from "react";
 import AddFolder from "../components/AddFolder";
 import FolderPreview from "../components/FolderPreview";
-import { Folder } from "../structures";
+import { RustFolder,Folder } from "../structures";
 import { invoke } from "@tauri-apps/api/core";
 
+
+
 async function getFolders() : Promise<Folder[]>{
-    const config_paths : string[] = await invoke("get_config_paths");
-    return config_paths.map(path => new Folder(path));
+    const rawFolders = await invoke<RustFolder[]>("get_folders");
+    return rawFolders.map(f => 
+        Folder.fromRustFolder(f)
+    );
 }
 
 function Folders(){

@@ -9,6 +9,7 @@ interface AddFolderProps {
 
 function AddFolder({ onClose, onAdded }: AddFolderProps) {
     const [path, setPath] = useState("");
+    const [id, setId] = useState("");
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     const selectFolder = async () => {
@@ -27,10 +28,10 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
     };
 
     const handleAdd = async () => {
-        if (!path) return;
+        if (!path || !id) return;
         setIsSubmitting(true);
         try {
-            await invoke("add_path_config", { path });
+            await invoke("add_folder", { path, id });
             if (onAdded) onAdded();
             onClose();
         } catch (error) {
@@ -45,6 +46,18 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>Add Folder</h2>
+
+                <div className="input-group">
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Folder ID (Unique Name)</label>
+                    <input
+                        type="text"
+                        value={id}
+                        onChange={(e) => setId(e.target.value)}
+                        placeholder="e.g. MyMusicLibrary"
+                        style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
+                    />
+                </div>
+
                 <div className="input-group">
                     <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Folder Path</label>
                     <div className="input-row">
@@ -67,7 +80,7 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
                     <button 
                         className="primary-btn" 
                         onClick={handleAdd} 
-                        disabled={!path || isSubmitting}
+                        disabled={!path || !id || isSubmitting}
                     >
                         {isSubmitting ? "Adding..." : "Add Folder"}
                     </button>
