@@ -279,3 +279,46 @@ button.secondary-btn:hover {
   background-color: #f23f4220;
   color: #f23f43;
 }
+
+/* Loading Spinner */
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  width: 100%;
+  color: var(--text-muted);
+}
+
+.spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--accent-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Scrollbar styles for playlists preview */
+.playlists-preview-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.playlists-preview-container::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.playlists-preview-container::-webkit-scrollbar-thumb {
+  background: var(--bg-primary);
+  border-radius: 4px;
+}
+
+.playlists-preview-container::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.1);
+}

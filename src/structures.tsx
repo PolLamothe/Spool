@@ -13,6 +13,12 @@ export interface RustFolder {
     lastSynchronized: string | null;
 }
 
+export interface RustPlaylist{
+    id : string,
+    name : string,
+    image_url : string | null
+}
+
 export interface ClientConfig{
     clientId : string;
     clientSecret : string;
@@ -31,6 +37,7 @@ export class Folder implements Folder {
     id: string;
     last_synchronized: Date;
     tracks : Track[];
+    playlist : RustPlaylist | null = null;
     
     constructor(path: string, id: string, last_synchronized: Date) {
         this.path = path;
@@ -52,6 +59,17 @@ export class Folder implements Folder {
         }
     }
 
+    async loadPlaylist() : Promise<void>{
+        try{
+            const playlist = await invoke<RustPlaylist>("get_playlist",{
+                playlistId: this.id
+            })
+            this.playlist = playlist;
+        }catch(error){
+            throw new Error(`Erreur lors du chargement de la playlist ${this.id} : ${error}`);
+        }
+    }
+
     static async fromRustFolder(f: RustFolder): Promise<Folder> {
         const folder = new Folder(
             f.path,
@@ -59,6 +77,7 @@ export class Folder implements Folder {
             f.lastSynchronized ? new Date(f.lastSynchronized) : new Date(0)
         );
         await folder.loadTracks();
+        await folder.loadPlaylist()
         return folder;
     }
 }

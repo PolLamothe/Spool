@@ -6,6 +6,7 @@ use rspotify::{
 use futures::StreamExt;
 use crate::track::{Track};
 use crate::config::{load_config, save_config};
+use crate::playlist::{Playlist};
 use tauri::Emitter;
 use url::Url;
 
@@ -114,6 +115,46 @@ pub async fn start_spotify_auth(app_handle: tauri::AppHandle) -> Result<(), Stri
     tauri_plugin_opener::open_url(url, None::<&str>).map_err(|e| e.to_string())?;
 
     Ok(())
+}
+
+#[tauri::command]
+pub async fn get_user_playlists(app_handle: tauri::AppHandle) -> Result<Vec<Playlist>, String> {
+    let spotify = get_spotify_client(&app_handle).await?;
+    let mut playlists = Vec::new();
+    let mut stream = spotify.current_user_playlists();
+
+    while let Some(playlist) = stream.next().await {
+        match playlist {
+            Ok(p) => {
+                playlists.push(Playlist {
+                    id: p.id.to_string(),
+                    name: p.name,
+                    image_url: p.images.first().map(|i| i.url.clone()),
+                });
+            }
+            Err(e) => return Err(format!("Erreur lors de la récupération des playlists: {}", e)),
+        }
+    }
+
+    Ok(playlists)
+}
+
+#[tauri::command]
+pub async fn get_playlist(
+    app_handle: tauri::AppHandle,
+    playlist_id: &str,
+) -> Result<Playlist, String> {
+    let spotify = get_spotify_client(&app_handle).await?;
+
+    let playlist_id = PlaylistId::from_id(playlist_id).map_err(|e| e.to_string())?;
+    
+    let p = spotify.playlist(playlist_id, None, None).await.map_err(|e| e.to_string())?;
+    
+    Ok(Playlist {
+        id: p.id.to_string(),
+        name: p.name,
+        image_url: p.images.first().map(|i| i.url.clone()),
+    })
 }
 
 #[tauri::command]

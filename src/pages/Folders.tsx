@@ -40,16 +40,16 @@ async function getFolders() : Promise<Folder[]>{
 function Folders(){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [folders,setFolders] = useState<Folder[]>([]);
-    const isFetching = useRef(false);
+    const [isLoading, setIsLoading] = useState(false);
 
     function refreshFolders(){
-        if (isFetching.current) return;
-        isFetching.current = true;
+        if (isLoading) return;
+        setIsLoading(true);
 
         getFolders()
             .then(setFolders)
             .finally(() => {
-                isFetching.current = false;
+                setIsLoading(false);
             });
     }
 
@@ -70,11 +70,23 @@ function Folders(){
                 Add a folder
             </button>
 
-            <div className="folder-list">
-                {folders.map((folder, index) => (
-                    <FolderPreview key={index} folder={folder} onDelete={()=>refreshFolders()}/>
-                ))}
-            </div>
+            {isLoading ? (
+                <div className="loader-container">
+                    <div className="spinner"></div>
+                    <p>Loading folders...</p>
+                </div>
+            ) : (
+                <div className="folder-list">
+                    {folders.map((folder, index) => (
+                        <FolderPreview key={index} folder={folder} onDelete={()=>refreshFolders()}/>
+                    ))}
+                    {folders.length === 0 && (
+                        <p style={{ color: 'var(--text-muted)', gridColumn: '1/-1', textAlign: 'center', marginTop: '2rem' }}>
+                            No folders added yet.
+                        </p>
+                    )}
+                </div>
+            )}
 
             {isModalOpen && (
                 <AddFolder 

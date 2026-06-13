@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
+import PlaylistsPreview from "./PlaylistsPreview";
+import { RustPlaylist } from "../structures";
+import { showError } from "../utils/notifications";
 
 interface AddFolderProps {
     onClose: () => void;
@@ -9,8 +12,24 @@ interface AddFolderProps {
 
 function AddFolder({ onClose, onAdded }: AddFolderProps) {
     const [path, setPath] = useState("");
-    const [id, setId] = useState("");
+    const [selectedPlaylistId, setSelectedPlaylistId] = useState("");
+    const [playlists,setPlaylists] = useState<RustPlaylist[]>([]);
+    const [isLoadingPlaylists, setIsLoadingPlaylists] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(()=>{
+        setIsLoadingPlaylists(true);
+        invoke<RustPlaylist[]>("get_user_playlists").then((playlists : RustPlaylist[])=>{
+            setPlaylists(playlists.map((playlist : RustPlaylist)=>{
+                playlist.id = playlist.id.split(":")[2]
+                return playlist;
+            }));
+        }).catch(error=>{
+            showError(error);
+        }).finally(() => {
+            setIsLoadingPlaylists(false);
+        });
+    },[]);
 
     const selectFolder = async () => {
         try {
@@ -28,10 +47,10 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
     };
 
     const handleAdd = async () => {
-        if (!path || !id) return;
+        if (!path || !selectedPlaylistId) return;
         setIsSubmitting(true);
         try {
-            await invoke("add_folder", { path, id });
+            await invoke("add_folder", { path, id: selectedPlaylistId });
             if (onAdded) onAdded();
             onClose();
         } catch (error) {
@@ -44,22 +63,27 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
 
     return (
         <div className="modal-overlay" onClick={onClose}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
                 <h2>Add Folder</h2>
 
                 <div className="input-group">
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Folder ID (Unique Name)</label>
-                    <input
-                        type="text"
-                        value={id}
-                        onChange={(e) => setId(e.target.value)}
-                        placeholder="e.g. MyMusicLibrary"
-                        style={{ width: '100%', padding: '0.5rem', marginTop: '0.25rem' }}
-                    />
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Select Spotify Playlist</label>
+                    {isLoadingPlaylists ? (
+                        <div className="loader-container" style={{ padding: '1rem' }}>
+                            <div className="spinner" style={{ width: '24px', height: '24px' }}></div>
+                            <p style={{ fontSize: '0.8rem' }}>Loading playlists...</p>
+                        </div>
+                    ) : (
+                        <PlaylistsPreview 
+                            playlists={playlists} 
+                            selectedId={selectedPlaylistId}
+                            onSelect={setSelectedPlaylistId}
+                        />
+                    )}
                 </div>
 
                 <div className="input-group">
-                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Folder Path</label>
+                    <label style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Local Folder Path</label>
                     <div className="input-row">
                         <input
                             type="text"
@@ -80,7 +104,7 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
                     <button 
                         className="primary-btn" 
                         onClick={handleAdd} 
-                        disabled={!path || !id || isSubmitting}
+                        disabled={!path || !selectedPlaylistId || isSubmitting}
                     >
                         {isSubmitting ? "Adding..." : "Add Folder"}
                     </button>
