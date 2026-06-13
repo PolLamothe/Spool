@@ -1,7 +1,7 @@
 #[derive(serde::Serialize, Clone)]
 pub struct Track{
-    title : String,
-    name : String,
-    year : u32,
-    duration : u32,
+    pub title : String,
+    pub name : String,
+    pub year : u32,
+    pub duration : u32,
 }

@@ -7,6 +7,13 @@ use crate::folder::{Folder};
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppConfig {
     folders: Vec<Folder>,
+    client : Option<ClientConfig>
+}
+
+#[derive(Serialize, Deserialize, Clone, Debug)]
+pub struct ClientConfig{
+    client_id : String,
+    client_secret : String
 }
 
 impl AppConfig {
@@ -35,7 +42,10 @@ fn get_config_file_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String
 }
 
 fn load_config(app_handle: &tauri::AppHandle) -> AppConfig {
-    let default_config = AppConfig { folders: Vec::new() };
+    let default_config = AppConfig { 
+        folders: Vec::new(),
+        client : None
+    };
 
     if let Ok(config_path) = get_config_file_path(&app_handle) {
         if config_path.exists() {
@@ -83,4 +93,17 @@ pub fn reset_folders(app_handle: tauri::AppHandle) -> Result<(), String> {
     let mut config = load_config(&app_handle);
     config.folders.clear();
     save_config(&app_handle, &config)
+}
+
+#[tauri::command]
+pub fn set_client_config(app_handle: tauri::AppHandle,client_id : String, client_secret : String)-> Result<(), String>{
+    let mut config = load_config(&app_handle);
+    config.client = Some(ClientConfig { client_id, client_secret });
+    save_config(&app_handle, &config)
+}
+
+#[tauri::command]
+pub fn get_client_config(app_handle: tauri::AppHandle) -> Option<ClientConfig>{
+    let config = load_config(&app_handle);
+    config.client
 }

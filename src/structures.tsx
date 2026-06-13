@@ -1,3 +1,5 @@
+import { invoke } from "@tauri-apps/api/core";
+
 export enum Page{
     Home = "Home",
     Playlists = "My Playlists",
@@ -10,11 +12,17 @@ export interface RustFolder {
     last_synchronized: string | null;
 }
 
+export interface ClientConfig{
+    client_id : string;
+    client_secret : string;
+}
+
 export class Folder implements Folder {
      
     path: string;
     id: string;
     last_synchronized: Date;
+    song_count : number;
     
     constructor(path: string,id: string,last_synchronized: Date) {
         this.path = path;

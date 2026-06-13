@@ -1,5 +1,7 @@
 mod config;
 mod folder;
+mod spotify;
+mod track;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -11,7 +13,10 @@ pub fn run() {
             config::get_folders,
             config::add_folder,
             config::remove_folder,
-            config::reset_folders
+            config::reset_folders,
+            config::set_client_config,
+            config::get_client_config,
+            spotify::get_playlist_tracks
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
