@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Sidebar from "./components/Sidebar";
 import Folders from "./pages/Folders";
 import Settings from "./pages/Settings";
@@ -6,7 +6,13 @@ import {Page} from "./structures";
 import "./App.css";
 
 function App() {
+  useEffect(() => {
+    console.log("React App initialized - Testing console logs");
+  }, []);
     const [currentPage, setCurrentPage] = useState(Page.Home);
+    console.log("App initialized - Log");
+    console.info("App initialized - Info");
+    console.error("App initialized - Error");
 
     return (
         <main className="container" id="container">

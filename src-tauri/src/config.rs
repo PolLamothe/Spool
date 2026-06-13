@@ -3,17 +3,20 @@ use std::path::PathBuf;
 use serde::{Serialize, Deserialize};
 use tauri::Manager;
 use crate::folder::{Folder};
+use rspotify::Token;
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
 pub struct AppConfig {
     folders: Vec<Folder>,
-    client : Option<ClientConfig>
+    pub client : Option<ClientConfig>,
+    pub token : Option<Token>
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
+#[serde(rename_all = "camelCase")]
 pub struct ClientConfig{
-    client_id : String,
-    client_secret : String
+    pub client_id : String,
+    pub client_secret : String
 }
 
 impl AppConfig {
@@ -41,10 +44,11 @@ fn get_config_file_path(app_handle: &tauri::AppHandle) -> Result<PathBuf, String
     Ok(path)
 }
 
-fn load_config(app_handle: &tauri::AppHandle) -> AppConfig {
+pub fn load_config(app_handle: &tauri::AppHandle) -> AppConfig {
     let default_config = AppConfig { 
         folders: Vec::new(),
-        client : None
+        client : None,
+        token : None
     };
 
     if let Ok(config_path) = get_config_file_path(&app_handle) {
@@ -59,7 +63,7 @@ fn load_config(app_handle: &tauri::AppHandle) -> AppConfig {
     default_config
 }
 
-fn save_config(app_handle: &tauri::AppHandle, config: &AppConfig) -> Result<(), String> {
+pub fn save_config(app_handle: &tauri::AppHandle, config: &AppConfig) -> Result<(), String> {
     let config_path = get_config_file_path(app_handle)?;
     let json_string = serde_json::to_string_pretty(config)
         .map_err(|e| e.to_string())?;
@@ -106,4 +110,17 @@ pub fn set_client_config(app_handle: tauri::AppHandle,client_id : String, client
 pub fn get_client_config(app_handle: tauri::AppHandle) -> Option<ClientConfig>{
     let config = load_config(&app_handle);
     config.client
+}
+
+#[tauri::command]
+pub fn set_token(app_handle: tauri::AppHandle, token: Option<Token>) -> Result<(), String> {
+    let mut config = load_config(&app_handle);
+    config.token = token;
+    save_config(&app_handle, &config)
+}
+
+#[tauri::command]
+pub fn get_token(app_handle: tauri::AppHandle) -> Option<Token> {
+    let config = load_config(&app_handle);
+    config.token
 }

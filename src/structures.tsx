@@ -1,4 +1,5 @@
 import { invoke } from "@tauri-apps/api/core";
+import { info } from "@tauri-apps/plugin-log";
 
 export enum Page{
     Home = "Home",
@@ -9,12 +10,19 @@ export enum Page{
 export interface RustFolder {
     path: string;
     id: string;
-    last_synchronized: string | null;
+    lastSynchronized: string | null;
 }
 
 export interface ClientConfig{
-    client_id : string;
-    client_secret : string;
+    clientId : string;
+    clientSecret : string;
+}
+
+export interface Track{
+    title : string,
+    name : string,
+    year : number,
+    duration : number,
 }
 
 export class Folder implements Folder {
@@ -22,19 +30,35 @@ export class Folder implements Folder {
     path: string;
     id: string;
     last_synchronized: Date;
-    song_count : number;
+    tracks : Track[];
     
-    constructor(path: string,id: string,last_synchronized: Date) {
+    constructor(path: string, id: string, last_synchronized: Date) {
         this.path = path;
         this.id = id;
         this.last_synchronized = last_synchronized;
+        this.tracks = [];
     }
 
-    static fromRustFolder(f: RustFolder): Folder {
-        return new Folder(
+    async loadTracks(): Promise<void> {
+        try {
+            const tracks = await invoke<Track[]>("get_playlist_tracks", {
+                playlistId: this.id
+            });
+            
+            this.tracks = tracks;
+            info(`Retrieved ${tracks.length} tracks for folder ${this.id}`);
+        } catch (error) {
+            throw new Error(`Erreur pour le dossier ${this.id} : ${error}`);
+        }
+    }
+
+    static async fromRustFolder(f: RustFolder): Promise<Folder> {
+        const folder = new Folder(
             f.path,
             f.id,
-            f.last_synchronized ? new Date(f.last_synchronized) : new Date(0)
+            f.lastSynchronized ? new Date(f.lastSynchronized) : new Date(0)
         );
+        await folder.loadTracks();
+        return folder;
     }
 }

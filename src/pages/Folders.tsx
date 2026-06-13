@@ -1,25 +1,56 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import AddFolder from "../components/AddFolder";
 import FolderPreview from "../components/FolderPreview";
-import { RustFolder,Folder } from "../structures";
+import { ClientConfig, RustFolder,Folder } from "../structures";
 import { invoke } from "@tauri-apps/api/core";
-
-
+import { showError } from "../utils/notifications";
 
 async function getFolders() : Promise<Folder[]>{
-    const rawFolders = await invoke<RustFolder[]>("get_folders");
-    return rawFolders.map(f => 
-        Folder.fromRustFolder(f)
-    );
+    try {
+        const rawFolders = await invoke<RustFolder[]>("get_folders");
+
+        const results = await Promise.allSettled(rawFolders.map(f =>
+            Folder.fromRustFolder(f)
+        ));
+
+        const folders: Folder[] = [];
+        let hasError = false;
+        let lastErrorMessage = "";
+
+        results.forEach(result => {
+            if (result.status === "fulfilled") {
+                folders.push(result.value);
+            } else {
+                hasError = true;
+                lastErrorMessage = result.reason?.message || String(result.reason);
+            }
+        });
+
+        if (hasError) {
+            showError("Certains dossiers n'ont pas pu être chargés : " + lastErrorMessage);
+        }
+
+        return folders;
+    } catch (error) {
+        showError("Erreur lors de la récupération des dossiers : " + error);
+        return [];
+    }
 }
 
 function Folders(){
     const [isModalOpen, setIsModalOpen] = useState(false);
-    
     const [folders,setFolders] = useState<Folder[]>([]);
+    const isFetching = useRef(false);
 
     function refreshFolders(){
-        getFolders().then(setFolders);
+        if (isFetching.current) return;
+        isFetching.current = true;
+
+        getFolders()
+            .then(setFolders)
+            .finally(() => {
+                isFetching.current = false;
+            });
     }
 
     useEffect(()=>{

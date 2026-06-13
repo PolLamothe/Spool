@@ -6,6 +6,8 @@
   "permissions": [
     "core:default",
     "opener:default",
-    "dialog:default"
+    "dialog:default",
+    "log:default",
+    "log:allow-log"
   ]
 }

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { invoke } from "@tauri-apps/api/core";
-import { ClientConfig } from "../structures";
+import { listen } from "@tauri-apps/api/event";
 
 interface SpotifyConfigModalProps {
     onClose: () => void;
@@ -9,18 +9,47 @@ interface SpotifyConfigModalProps {
 function SpotifyConfigModal({ onClose }: SpotifyConfigModalProps) {
     const [clientId, setClientId] = useState("");
     const [clientSecret, setClientSecret] = useState("");
+    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    const [isLoggingIn, setIsLoggingIn] = useState(false);
 
     useEffect(()=>{
-        invoke<ClientConfig>("get_client_config").then((clientConfig : ClientConfig)=>{
-            setClientId(clientConfig.client_id);
-            setClientSecret(clientConfig.client_secret);
+        invoke<any>("get_client_config").then((clientConfig)=>{
+            if (clientConfig) {
+                setClientId(clientConfig.clientId);
+                setClientSecret(clientConfig.clientSecret);
+            }
         });
+
+        invoke<any>("get_token").then((token)=>{
+            setIsAuthenticated(!!token);
+        });
+
+        const unlisten = listen("spotify-auth-success", () => {
+            setIsAuthenticated(true);
+            setIsLoggingIn(false);
+        });
+
+        return () => {
+            unlisten.then(u => u());
+        };
 
     },[]);
 
     const handleSave = async () => {
-        invoke("set_client_config", { clientId, clientSecret });
+        await invoke("set_client_config", { clientId, clientSecret });
         onClose();
+    };
+
+    const handleLogin = async () => {
+        setIsLoggingIn(true);
+        try {
+            await handleSave();
+            await invoke("start_spotify_auth");
+        } catch (error) {
+            console.error("Login failed:", error);
+            setIsLoggingIn(false);
+            alert("Login failed: " + error);
+        }
     };
 
     return (
@@ -50,16 +79,34 @@ function SpotifyConfigModal({ onClose }: SpotifyConfigModalProps) {
                     />
                 </div>
 
-                <div className="modal-actions">
-                    <button className="secondary-btn" onClick={onClose}>
-                        Cancel
-                    </button>
+                <div style={{ margin: '1rem 0', padding: '1rem', borderRadius: '4px', backgroundColor: isAuthenticated ? 'rgba(29, 185, 84, 0.1)' : 'rgba(255, 0, 0, 0.1)', border: `1px solid ${isAuthenticated ? '#1db954' : '#ff0000'}` }}>
+                    <p style={{ margin: 0, fontSize: '0.9rem', color: isAuthenticated ? '#1db954' : '#ff0000' }}>
+                        Status: {isAuthenticated ? "Authenticated" : "Not Authenticated"}
+                    </p>
+                </div>
+
+                <div className="modal-actions" style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                     <button 
                         className="primary-btn" 
-                        onClick={handleSave}
+                        onClick={handleLogin}
+                        disabled={isLoggingIn || !clientId || !clientSecret}
+                        style={{ backgroundColor: '#1db954', color: 'white' }}
                     >
-                        Save Configuration
+                        {isLoggingIn ? "Logging in..." : (isAuthenticated ? "Re-authenticate with Spotify" : "Login with Spotify")}
                     </button>
+                    
+                    <div style={{ display: 'flex', gap: '0.5rem', marginTop: '0.5rem' }}>
+                        <button className="secondary-btn" onClick={onClose} style={{ flex: 1 }}>
+                            Close
+                        </button>
+                        <button 
+                            className="primary-btn" 
+                            onClick={handleSave}
+                            style={{ flex: 1 }}
+                        >
+                            Save Config
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
