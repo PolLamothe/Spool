@@ -7,9 +7,10 @@ interface FolderPreviewProps {
     folder: Folder;
     onDelete: () => void;
     onUpdate: () => void;
+    onClick: () => void;
 }
 
-function FolderPreview({ folder, onDelete, onUpdate }: FolderPreviewProps){
+function FolderPreview({ folder, onDelete, onUpdate, onClick }: FolderPreviewProps){
     const [isDeleting, setIsDeleting] = useState(false);
     const [isEditing, setIsEditing] = useState(false);
 
@@ -28,7 +29,15 @@ function FolderPreview({ folder, onDelete, onUpdate }: FolderPreviewProps){
     }
 
     return (
-        <div className="folder-card" style={{ opacity: isDeleting ? 0.6 : 1, pointerEvents: isDeleting ? 'none' : 'auto' }}>
+        <div 
+            className="folder-card" 
+            style={{ 
+                opacity: isDeleting ? 0.6 : 1, 
+                pointerEvents: isDeleting ? 'none' : 'auto',
+                cursor: 'pointer'
+            }}
+            onClick={onClick}
+        >
             <div className="folder-icon">
                 {folder.playlist?.image_url ? (
                     <img 
@@ -47,7 +56,7 @@ function FolderPreview({ folder, onDelete, onUpdate }: FolderPreviewProps){
                 <p className="folder-meta">{folder.playlist?.name || folder.id}</p>
                 <p className="folder-meta">Last updated: {folder.last_synchronized.getTime() === 0 ? "Never" : folder.last_synchronized.toLocaleString()}</p>
             </div>
-            <div style={{ display: 'flex', gap: '8px' }}>
+            <div style={{ display: 'flex', gap: '8px' }} onClick={(e) => e.stopPropagation()}>
                 <button className="edit-btn" title="Edit folder" onClick={() => setIsEditing(true)}>
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                         <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>

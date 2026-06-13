@@ -190,6 +190,7 @@ pub async fn get_playlist_tracks(
                         album: t.album.name.clone(),
                         year,
                         duration: t.duration.num_milliseconds() as u32,
+                        image_url: t.album.images.first().map(|i| i.url.clone()),
                     });
                 }
             }

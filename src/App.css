@@ -327,3 +327,153 @@ button.secondary-btn:hover {
 .playlists-preview-container::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.1);
 }
+
+/* Folder Detail View */
+.folder-detail {
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+.folder-detail-header {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.back-btn {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  padding: 0;
+  width: fit-content;
+}
+
+.back-btn:hover {
+  color: var(--text-primary);
+}
+
+.folder-header-content {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-end;
+}
+
+.folder-large-image {
+  width: 192px;
+  height: 192px;
+  border-radius: var(--border-radius-md);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+  object-fit: cover;
+}
+
+.folder-header-text h1 {
+  font-size: 3rem;
+  margin: 0 0 0.5rem 0;
+}
+
+.folder-path-large {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  margin-bottom: 0.5rem;
+}
+
+.folder-stats {
+  color: var(--text-muted);
+  font-size: 0.9rem;
+  font-weight: 500;
+}
+
+/* Track Table */
+.track-list-container {
+  background-color: var(--bg-secondary);
+  border-radius: var(--border-radius-lg);
+  padding: 1rem;
+  overflow: hidden;
+}
+
+.track-table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.track-table th {
+  color: var(--text-muted);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.track-row {
+  border-radius: var(--border-radius-sm);
+  transition: background-color var(--transition-speed) ease;
+}
+
+.track-row:hover {
+  background-color: var(--hover-bg);
+}
+
+.track-table td {
+  padding: 0.75rem 1rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  vertical-align: middle;
+}
+
+.track-num {
+  width: 40px;
+  text-align: center;
+}
+
+.track-title-cell {
+  max-width: 300px;
+}
+
+.track-info-flex {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.track-mini-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  object-fit: cover;
+}
+
+.track-name {
+  color: var(--text-primary);
+  font-weight: 500;
+  margin: 0;
+}
+
+.track-artist {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.track-album, .track-year {
+  color: var(--text-muted);
+}
+
+.track-duration {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  width: 100px;
+}
+
+.empty-tracks {
+  padding: 4rem 2rem;
+  text-align: center;
+  color: var(--text-muted);
+}

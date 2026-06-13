@@ -37,7 +37,7 @@ async function getFolders() : Promise<Folder[]>{
     }
 }
 
-function Folders(){
+function Folders({ onSelectFolder }: { onSelectFolder: (folder: Folder) => void }){
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [folders,setFolders] = useState<Folder[]>([]);
     const [isLoading, setIsLoading] = useState(false);
@@ -83,6 +83,7 @@ function Folders(){
                             folder={folder} 
                             onDelete={() => refreshFolders()} 
                             onUpdate={() => refreshFolders()}
+                            onClick={() => onSelectFolder(folder)}
                         />
                     ))}
                     {folders.length === 0 && (

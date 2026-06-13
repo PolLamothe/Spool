@@ -4,7 +4,8 @@ import { info } from "@tauri-apps/plugin-log";
 export enum Page{
     Home = "Home",
     Playlists = "My Playlists",
-    Settings = "Settings"
+    Settings = "Settings",
+    FolderDetail = "Folder Detail"
 }
 
 export interface RustFolder {
@@ -30,6 +31,7 @@ export interface Track{
     album : string,
     year : number,
     duration : number,
+    image_url : string | null,
 }
 
 export class Folder implements Folder {
