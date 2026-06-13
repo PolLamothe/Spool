@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { open } from "@tauri-apps/plugin-dialog";
 import { invoke } from "@tauri-apps/api/core";
 import PlaylistsPreview from "./PlaylistsPreview";
@@ -61,7 +62,7 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
         }
     };
 
-    return (
+    return createPortal(
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()} style={{ maxWidth: '500px' }}>
                 <h2>Add Folder</h2>
@@ -110,7 +111,8 @@ function AddFolder({ onClose, onAdded }: AddFolderProps) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

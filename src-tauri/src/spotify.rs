@@ -175,13 +175,20 @@ pub async fn get_playlist_tracks(
         match item {
             Ok(item) => {
                 if let Some(PlayableItem::Track(t)) = item.item {
+                    let year = t.album.release_date
+                        .as_ref()
+                        .and_then(|date| date.split('-').next())
+                        .and_then(|y| y.parse::<u32>().ok())
+                        .unwrap_or(0);
+
                     tracks.push(Track {
                         title: t.name.clone(),
                         name: t.artists
                             .first()
                             .map(|a| a.name.clone())
                             .unwrap_or_else(|| "Unknown Artist".to_string()),
-                        year: 0,
+                        album: t.album.name.clone(),
+                        year,
                         duration: t.duration.num_milliseconds() as u32,
                     });
                 }

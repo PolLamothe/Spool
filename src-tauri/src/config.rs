@@ -93,6 +93,17 @@ pub fn remove_folder(app_handle: tauri::AppHandle, path: String,id : String) -> 
 }
 
 #[tauri::command]
+pub fn update_folder(app_handle: tauri::AppHandle, path: String, old_id: String, new_id: String) -> Result<(), String> {
+    let mut config = load_config(&app_handle);
+    if let Some(folder) = config.folders.iter_mut().find(|f| f.path == path && f.id == old_id) {
+        folder.id = new_id;
+        save_config(&app_handle, &config)
+    } else {
+        Err("Folder not found".to_string())
+    }
+}
+
+#[tauri::command]
 pub fn reset_folders(app_handle: tauri::AppHandle) -> Result<(), String> {
     let mut config = load_config(&app_handle);
     config.folders.clear();

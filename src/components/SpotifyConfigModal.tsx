@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { invoke } from "@tauri-apps/api/core";
 import { listen } from "@tauri-apps/api/event";
 
@@ -58,7 +59,7 @@ function SpotifyConfigModal({ onClose }: SpotifyConfigModalProps) {
         }
     };
 
-    return (
+    return createPortal(
         <div className="modal-overlay" onClick={onClose}>
             <div className="modal-content" onClick={(e) => e.stopPropagation()}>
                 <h2>Spotify Configuration</h2>
@@ -124,7 +125,8 @@ function SpotifyConfigModal({ onClose }: SpotifyConfigModalProps) {
                     </>
                 )}
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
 

@@ -257,7 +257,7 @@ button.secondary-btn:hover {
   color: var(--text-muted);
 }
 
-.delete-btn {
+.delete-btn, .edit-btn {
   background: transparent;
   border: none;
   color: var(--text-muted);
@@ -271,13 +271,18 @@ button.secondary-btn:hover {
   opacity: 0;
 }
 
-.folder-card:hover .delete-btn {
+.folder-card:hover .delete-btn, .folder-card:hover .edit-btn {
   opacity: 1;
 }
 
 .delete-btn:hover {
   background-color: #f23f4220;
   color: #f23f43;
+}
+
+.edit-btn:hover {
+  background-color: var(--hover-bg);
+  color: var(--text-primary);
 }
 
 /* Loading Spinner */

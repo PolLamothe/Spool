@@ -78,7 +78,12 @@ function Folders(){
             ) : (
                 <div className="folder-list">
                     {folders.map((folder, index) => (
-                        <FolderPreview key={index} folder={folder} onDelete={()=>refreshFolders()}/>
+                        <FolderPreview 
+                            key={index} 
+                            folder={folder} 
+                            onDelete={() => refreshFolders()} 
+                            onUpdate={() => refreshFolders()}
+                        />
                     ))}
                     {folders.length === 0 && (
                         <p style={{ color: 'var(--text-muted)', gridColumn: '1/-1', textAlign: 'center', marginTop: '2rem' }}>

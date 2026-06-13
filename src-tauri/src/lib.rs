@@ -27,6 +27,7 @@ pub fn run() {
             config::get_folders,
             config::add_folder,
             config::remove_folder,
+            config::update_folder,
             config::reset_folders,
             config::set_client_config,
             config::get_client_config,

@@ -27,6 +27,7 @@ export interface ClientConfig{
 export interface Track{
     title : string,
     name : string,
+    album : string,
     year : number,
     duration : number,
 }
