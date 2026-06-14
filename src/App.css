@@ -191,18 +191,35 @@ button.primary-btn:active {
 }
 
 button.secondary-btn {
-  background: transparent;
+  background-color: var(--bg-tertiary);
   color: var(--text-primary);
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0.6rem 1.2rem;
   cursor: pointer;
   font-size: 0.9rem;
   font-weight: 500;
   border-radius: var(--border-radius-sm);
+  transition: all var(--transition-speed) ease;
 }
 
 button.secondary-btn:hover {
-  text-decoration: underline;
+  background-color: var(--hover-bg);
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+button.secondary-btn:active {
+  background-color: var(--active-bg);
+}
+
+button.secondary-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.folder-actions {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
 }
 
 /* Folder List and Card Styles */
@@ -310,6 +327,37 @@ button.secondary-btn:hover {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  border-radius: var(--border-radius-lg);
+  backdrop-filter: blur(2px);
+}
+
+.loader {
+  width: 40px;
+  height: 40px;
+  border: 4px solid rgba(255, 255, 255, 0.1);
+  border-radius: 50%;
+  border-top-color: var(--accent-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+.dimmed {
+  opacity: 0.5;
+  pointer-events: none;
 }
 
 /* Scrollbar styles */
@@ -435,6 +483,7 @@ button.secondary-btn:hover {
 }
 
 .folder-main-content {
+  position: relative;
   display: flex;
   flex-direction: column;
   flex: 1;

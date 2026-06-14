@@ -13,6 +13,16 @@ function App() {
   }, []);
     const [currentPage, setCurrentPage] = useState(Page.Home);
     const [selectedFolder, setSelectedFolder] = useState<Folder | null>(null);
+    const [folders, setFolders] = useState<Folder[]>([]);
+
+    useEffect(() => {
+        if (selectedFolder) {
+            const updated = folders.find(f => f.id === selectedFolder.id);
+            if (updated && updated !== selectedFolder) {
+                setSelectedFolder(updated || null);
+            }
+        }
+    }, [folders]);
 
     const navigateToFolder = (folder: Folder) => {
         setSelectedFolder(folder);
@@ -27,7 +37,13 @@ function App() {
         <main className="container" id="container">
             <Sidebar currentPage={currentPage} updatePage={setCurrentPage} />
             <div id="content-area">
-                {currentPage == Page.Playlists && <Folders onSelectFolder={navigateToFolder} />}
+                {currentPage == Page.Playlists && (
+                    <Folders 
+                        folders={folders} 
+                        setFolders={setFolders} 
+                        onSelectFolder={navigateToFolder} 
+                    />
+                )}
                 {currentPage == Page.Settings && <Settings />}
                 {currentPage == Page.Home && <p>{currentPage}</p>}
                 {currentPage == Page.FolderDetail && selectedFolder && (

@@ -5,7 +5,7 @@ import { RustFolder,Folder } from "../structures";
 import { invoke } from "@tauri-apps/api/core";
 import { showError } from "../utils/notifications";
 
-async function getFolders() : Promise<Folder[]>{
+async function getFolders(existingFolders: Folder[] = []) : Promise<Folder[]>{
     try {
         const rawFolders = await invoke<RustFolder[]>("get_folders");
 
@@ -19,7 +19,13 @@ async function getFolders() : Promise<Folder[]>{
 
         results.forEach(result => {
             if (result.status === "fulfilled") {
-                folders.push(result.value);
+                const folder = result.value;
+                // Preserve tracks if folder already existed
+                const existing = existingFolders.find(ef => ef.id === folder.id);
+                if (existing && existing.tracks.length > 0) {
+                    folder.tracks = existing.tracks;
+                }
+                folders.push(folder);
             } else {
                 hasError = true;
                 lastErrorMessage = result.reason?.message || String(result.reason);
@@ -37,16 +43,15 @@ async function getFolders() : Promise<Folder[]>{
     }
 }
 
-function Folders({ onSelectFolder }: { onSelectFolder: (folder: Folder) => void }){
+function Folders({ folders, setFolders, onSelectFolder }: { folders: Folder[], setFolders: (folders: Folder[]) => void, onSelectFolder: (folder: Folder) => void }){
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [folders,setFolders] = useState<Folder[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     function refreshFolders(){
         if (isLoading) return;
         setIsLoading(true);
 
-        getFolders()
+        getFolders(folders)
             .then(setFolders)
             .finally(() => {
                 setIsLoading(false);
@@ -54,7 +59,9 @@ function Folders({ onSelectFolder }: { onSelectFolder: (folder: Folder) => void 
     }
 
     useEffect(()=>{
-        refreshFolders();
+        if (folders.length === 0) {
+            refreshFolders();
+        }
     },[])
 
     return (
@@ -63,12 +70,21 @@ function Folders({ onSelectFolder }: { onSelectFolder: (folder: Folder) => void 
             <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
                 Manage your music library folders.
             </p>
-            <button 
-                className="primary-btn" 
-                onClick={() => setIsModalOpen(true)}
-            >
-                Add a folder
-            </button>
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
+                <button 
+                    className="primary-btn" 
+                    onClick={() => setIsModalOpen(true)}
+                >
+                    Add a folder
+                </button>
+                <button 
+                    className="secondary-btn" 
+                    onClick={() => refreshFolders()}
+                    disabled={isLoading}
+                >
+                    {isLoading ? "Reloading..." : "Reload"}
+                </button>
+            </div>
 
             {isLoading ? (
                 <div className="loader-container">

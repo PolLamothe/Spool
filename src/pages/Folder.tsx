@@ -11,26 +11,44 @@ interface FolderProps {
 function FolderPage({ folder, onBack, onError }: FolderProps) {
     const [tracks,setTracks] = useState<Track[]>(folder.tracks);
     const [youtubeTracks, setYoutubeTracks] = useState<YoutubeTrack[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
 
     useEffect(()=>{
         if(folder.tracks.length == 0){
+            setIsLoading(true);
             folder.loadTracks().then(()=>{
                 setTracks(folder.tracks);
             }).catch((err)=>{
                 onError(String(err));
+            }).finally(() => {
+                setIsLoading(false);
             })
         }
     },[]);
 
     const handleLoadYoutube = () => {
         if(folder.tracks.length > 0){
+            setIsLoading(true);
             invoke<YoutubeTrack[]>("get_playlist_youtube_tracks",{tracks : folder.tracks})
             .then((youtubeTracks)=>{
                 setYoutubeTracks(youtubeTracks);
             }).catch(err=>{
                 onError(String(err));
+            }).finally(() => {
+                setIsLoading(false);
             })
         }
+    };
+
+    const handleReload = () => {
+        setIsLoading(true);
+        folder.loadTracks().then(()=>{
+            setTracks([...folder.tracks]);
+        }).catch((err)=>{
+            onError(String(err));
+        }).finally(() => {
+            setIsLoading(false);
+        })
     };
 
     return (
@@ -52,16 +70,27 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
                         <p className="folder-path-large">{folder.path}</p>
                         <div className="folder-stats-row">
                             <p className="folder-stats">{folder.tracks.length} tracks</p>
-                            <button className="primary-btn load-youtube-btn" onClick={handleLoadYoutube}>
-                                Load YouTube Tracks
-                            </button>
+                            <div className="folder-actions">
+                                <button className="secondary-btn" onClick={handleReload} disabled={isLoading}>
+                                    {isLoading ? "Reloading..." : "Reload"}
+                                </button>
+                                <button className="primary-btn load-youtube-btn" onClick={handleLoadYoutube} disabled={isLoading || tracks.length === 0}>
+                                    {isLoading ? "Loading..." : "Load YouTube Tracks"}
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </header>
 
             <div className="folder-main-content">
-                <div className="track-list-container">
+                {isLoading && (
+                    <div className="loading-overlay">
+                        <div className="loader"></div>
+                        <p>Loading tracks...</p>
+                    </div>
+                )}
+                <div className={`track-list-container ${isLoading ? 'dimmed' : ''}`}>
                     <table className="track-table">
                         <thead>
                             <tr>
@@ -111,7 +140,7 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
                             ))}
                         </tbody>
                     </table>
-                    {folder.tracks.length === 0 && (
+                    {!isLoading && folder.tracks.length === 0 && (
                         <div className="empty-tracks">
                             <p>No tracks found in this folder.</p>
                         </div>
