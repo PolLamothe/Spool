@@ -4,6 +4,7 @@ import Folders from "./pages/Folders";
 import Settings from "./pages/Settings";
 import FolderPage from "./pages/Folder";
 import {Page, Folder} from "./structures";
+import { showError } from "./utils/notifications";
 import "./App.css";
 
 function App() {
@@ -30,9 +31,10 @@ function App() {
                 {currentPage == Page.Settings && <Settings />}
                 {currentPage == Page.Home && <p>{currentPage}</p>}
                 {currentPage == Page.FolderDetail && selectedFolder && (
-                    <FolderPage 
-                        folder={selectedFolder} 
-                        onBack={() => setCurrentPage(Page.Playlists)} 
+                    <FolderPage
+                        folder={selectedFolder}
+                        onBack={() => setCurrentPage(Page.Playlists)}
+                        onError={(msg) => showError(msg)}
                     />
                 )}
             </div>

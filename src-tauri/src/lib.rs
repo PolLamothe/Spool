@@ -3,6 +3,7 @@ mod folder;
 mod spotify;
 mod track;
 mod playlist;
+mod youtube;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
@@ -36,7 +37,9 @@ pub fn run() {
             spotify::start_spotify_auth,
             spotify::get_playlist,
             spotify::get_playlist_tracks,
-            spotify::get_user_playlists
+            spotify::get_user_playlists,
+            youtube::get_youtube_info,
+            youtube::get_playlist_youtube_tracks
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

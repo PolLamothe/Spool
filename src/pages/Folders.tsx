@@ -1,7 +1,7 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import AddFolder from "../components/AddFolder";
 import FolderPreview from "../components/FolderPreview";
-import { ClientConfig, RustFolder,Folder } from "../structures";
+import { RustFolder,Folder } from "../structures";
 import { invoke } from "@tauri-apps/api/core";
 import { showError } from "../utils/notifications";
 
@@ -58,7 +58,7 @@ function Folders({ onSelectFolder }: { onSelectFolder: (folder: Folder) => void 
     },[])
 
     return (
-        <div>
+        <div className="scrollable-page">
             <h1>Folders</h1>
             <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
                 Manage your music library folders.

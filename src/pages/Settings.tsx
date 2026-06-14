@@ -24,7 +24,7 @@ function Settings() {
     };
 
     return (
-        <div className="settings-page">
+        <div className="settings-page scrollable-page">
             <h1>Settings</h1>
             <p style={{ color: 'var(--text-muted)', marginBottom: '1.5rem' }}>
                 Manage your application preferences.

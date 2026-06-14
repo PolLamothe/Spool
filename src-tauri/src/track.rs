@@ -1,4 +1,4 @@
-#[derive(serde::Serialize, Clone)]
+#[derive(serde::Serialize, serde::Deserialize, Clone)]
 pub struct Track{
     pub title : String,
     pub name : String,
@@ -6,4 +6,4 @@ pub struct Track{
     pub year : u32,
     pub duration : u32,
     pub image_url : Option<String>,
-}
+    }

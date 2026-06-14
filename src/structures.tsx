@@ -34,6 +34,16 @@ export interface Track{
     image_url : string | null,
 }
 
+export interface YoutubeTrack{
+    url: string,
+    title: string,
+    views: string,
+    duration: string,
+    thumbnail: string,
+    channel: string,
+    published_at: string,
+}
+
 export class Folder implements Folder {
      
     path: string;
@@ -79,7 +89,6 @@ export class Folder implements Folder {
             f.id,
             f.lastSynchronized ? new Date(f.lastSynchronized) : new Date(0)
         );
-        await folder.loadTracks();
         await folder.loadPlaylist()
         return folder;
     }
