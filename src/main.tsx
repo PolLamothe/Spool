@@ -1,4 +1,3 @@
-import React from "react";
 import ReactDOM from "react-dom/client";
 import App from "./App";
 import { attachConsole, info } from "@tauri-apps/plugin-log";

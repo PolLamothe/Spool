@@ -8,6 +8,18 @@ export enum Page{
     FolderDetail = "Folder Detail"
 }
 
+export enum DownloadTrackStatus{
+    NotDownloaded = "Not downloaded",
+    Downloaded = "Downloaded",
+    NotInPlaylist = "Not in playlist",
+}
+
+export enum DownloadTrackAction{
+    Download,
+    NotDownload,
+    Delete
+}
+
 export interface RustFolder {
     path: string;
     id: string;
@@ -42,6 +54,40 @@ export interface YoutubeTrack{
     thumbnail: string,
     channel: string,
     published_at: string,
+}
+
+export interface LocalTrack {
+    name: string,
+    duration: number,
+}
+
+export abstract class DownloadTrackElement {
+    status: DownloadTrackStatus;
+    action: DownloadTrackAction;
+
+    constructor(status: DownloadTrackStatus, action: DownloadTrackAction) {
+        this.status = status;
+        this.action = action;
+    }
+}
+
+export class SpotifyTrackElement extends DownloadTrackElement {
+    track: Track;
+    youtubeTrack?: YoutubeTrack;
+
+    constructor(track: Track) {
+        super(DownloadTrackStatus.NotDownloaded, DownloadTrackAction.Download);
+        this.track = track;
+    }
+}
+
+export class OrphanFileElement extends DownloadTrackElement {
+    filename: string;
+
+    constructor(filename: string) {
+        super(DownloadTrackStatus.NotInPlaylist, DownloadTrackAction.Delete);
+        this.filename = filename;
+    }
 }
 
 export class Folder implements Folder {

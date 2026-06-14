@@ -600,6 +600,99 @@ button.secondary-btn:disabled {
   width: 100px;
 }
 
+/* Toggle Switch */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 40px;
+  height: 20px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--bg-tertiary);
+  transition: .4s;
+  border-radius: 20px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 14px;
+  width: 14px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--text-secondary);
+  transition: .4s;
+  border-radius: 50%;
+}
+
+input:checked + .slider {
+  background-color: var(--accent-color);
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
+  background-color: white;
+}
+
+.track-download {
+  width: 80px;
+  text-align: center;
+}
+
+.track-download-cell {
+  text-align: center;
+}
+
+.track-status {
+  width: 150px;
+  text-align: center;
+}
+
+.track-status-cell {
+  text-align: center;
+}
+
+.status-tag {
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  display: inline-block;
+  white-space: nowrap;
+}
+
+.status-downloaded {
+  background-color: rgba(35, 165, 90, 0.15);
+  color: #23a55a;
+  border: 1px solid rgba(35, 165, 90, 0.2);
+}
+
+.status-not-downloaded {
+  background-color: rgba(148, 155, 164, 0.15);
+  color: #b5bac1;
+  border: 1px solid rgba(148, 155, 164, 0.2);
+}
+
+.status-not-in-playlist {
+  background-color: rgba(242, 63, 67, 0.15);
+  color: #f23f43;
+  border: 1px solid rgba(242, 63, 67, 0.2);
+}
+
 .empty-tracks {
   padding: 4rem 2rem;
   text-align: center;

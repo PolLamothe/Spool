@@ -19,7 +19,7 @@ For many DJs, Spotify is the ultimate discovery tool, but using those tracks in 
 - **State & Config:** JSON-based persistent configuration with Rust-side management.
 - **External APIs:** 
   - **Spotify API:** Metadata retrieval via [rspotify](https://github.com/ramsayleung/rspotify).
-  - **YouTube:** Search and matching via [rustypipe](https://github.com/thep0y/rustypipe).
+  - **YouTube:** Search and matching via [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
 ## ✨ Features
 
@@ -89,7 +89,7 @@ For many DJs, Spotify is the ultimate discovery tool, but using those tracks in 
 - `src-tauri/`: Rust backend source code.
   - `src/config.rs`: Persistent JSON configuration logic.
   - `src/spotify.rs`: Spotify OAuth and API interaction.
-  - `src/youtube.rs`: YouTube search and matching via RustyPipe.
+  - `src/youtube.rs`: YouTube search and matching via yt-dlp.
   - `src/lib.rs`: Tauri command definitions and app entry point.
 
 ## 📝 License
