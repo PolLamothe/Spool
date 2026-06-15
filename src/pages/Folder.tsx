@@ -12,7 +12,8 @@ import {
 import { invoke } from "@tauri-apps/api/core";
 import { getSafeName } from "../utils/filename";
 import { FolderHeader } from "../components/FolderHeader";
-import { TrackRow } from "../components/TrackRow";
+import { InitialTrackList } from "../components/InitialTrackList";
+import { YoutubeTrackList } from "../components/YoutubeTrackList";
 
 interface FolderProps {
     folder: Folder;
@@ -156,8 +157,8 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
     [spotifyElements]);
 
     const showDownloadBtn = useMemo(() => 
-        hasYoutubeResults || orphanElements.length > 0,
-    [hasYoutubeResults, orphanElements]);
+        hasYoutubeResults,
+    [hasYoutubeResults]);
 
     return (
         <div className="folder-detail">
@@ -182,96 +183,19 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
                 
                 <div className={`track-list-container ${isLoading ? 'dimmed' : ''}`}>
                     {!hasYoutubeResults ? (
-                        <table className="track-table">
-                            <thead>
-                                <tr>
-                                    <th className="track-num">#</th>
-                                    <th className="track-spotify">Track Info</th>
-                                    <th className="track-album">Album</th>
-                                    <th className="track-duration">Duration</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {elements.map((el, index) => (
-                                    <TrackRow 
-                                        key={index}
-                                        el={el}
-                                        index={index}
-                                        hasYoutubeResults={false}
-                                        onToggleAction={handleActionToggle}
-                                        getStatusClass={getStatusClass}
-                                    />
-                                ))}
-                            </tbody>
-                        </table>
+                        <InitialTrackList 
+                            elements={elements}
+                            onToggleAction={handleActionToggle}
+                            getStatusClass={getStatusClass}
+                        />
                     ) : (
-                        <>
-                            <table className="track-table">
-                                <thead>
-                                    <tr>
-                                        <th className="track-num">#</th>
-                                        <th className="track-spotify">Track Info</th>
-                                        <th className="track-youtube">YouTube Result</th>
-                                        <th className="track-download">Download</th>
-                                        <th className="track-status">Status</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {spotifyElements.map((el) => {
-                                        const originalIndex = elements.indexOf(el);
-                                        return (
-                                            <TrackRow 
-                                                key={originalIndex}
-                                                el={el}
-                                                index={originalIndex}
-                                                hasYoutubeResults={true}
-                                                onToggleAction={handleActionToggle}
-                                                getStatusClass={getStatusClass}
-                                            />
-                                        );
-                                    })}
-                                </tbody>
-                            </table>
-
-                            {orphanElements.length > 0 && (
-                                <div className="orphan-tracks-section" style={{ marginTop: '3rem' }}>
-                                    <div className="section-header" style={{ marginBottom: '1rem', padding: '0 1rem' }}>
-                                        <h3 style={{ margin: 0, color: '#f23f43', display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                                            <span>⚠️</span> Orphan Files
-                                        </h3>
-                                        <p style={{ margin: '0.25rem 0 0 1.75rem', fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-                                            These files are in your folder but not in the Spotify playlist.
-                                        </p>
-                                    </div>
-                                    <table className="track-table">
-                                        <thead>
-                                            <tr>
-                                                <th className="track-num">#</th>
-                                                <th className="track-spotify">Filename</th>
-                                                <th className="track-download">Download</th>
-                                                <th className="track-status">Status</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {orphanElements.map((el) => {
-                                                const originalIndex = elements.indexOf(el);
-                                                return (
-                                                    <TrackRow 
-                                                        key={originalIndex}
-                                                        el={el}
-                                                        index={originalIndex}
-                                                        hasYoutubeResults={true}
-                                                        hideYoutubeColumn={true}
-                                                        onToggleAction={handleActionToggle}
-                                                        getStatusClass={getStatusClass}
-                                                    />
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            )}
-                        </>
+                        <YoutubeTrackList 
+                            elements={elements}
+                            spotifyElements={spotifyElements}
+                            orphanElements={orphanElements}
+                            onToggleAction={handleActionToggle}
+                            getStatusClass={getStatusClass}
+                        />
                     )}
                     
                     {!isLoading && elements.length === 0 && (
