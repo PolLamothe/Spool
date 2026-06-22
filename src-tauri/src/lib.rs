@@ -35,6 +35,8 @@ pub fn run() {
             config::get_client_config,
             config::set_token,
             config::get_token,
+            config::set_youtube_cookies_browser,
+            config::get_youtube_cookies_browser,
             spotify::start_spotify_auth,
             spotify::get_playlist,
             spotify::get_playlist_tracks,

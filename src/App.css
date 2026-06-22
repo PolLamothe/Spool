@@ -698,3 +698,22 @@ input:checked + .slider:before {
   text-align: center;
   color: var(--text-muted);
 }
+
+.cookies-select {
+  background-color: var(--bg-tertiary);
+  border: 1px solid rgba(0, 0, 0, 0.3);
+  padding: 0.6rem;
+  border-radius: var(--border-radius-sm);
+  color: var(--text-primary);
+  font-size: 0.9rem;
+  width: 100%;
+  max-width: 300px;
+  cursor: pointer;
+  outline: none;
+  transition: border-color var(--transition-speed) ease;
+}
+
+.cookies-select:focus {
+  border-color: var(--accent-color);
+  outline: 1px solid var(--accent-color);
+}

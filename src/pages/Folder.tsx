@@ -24,30 +24,68 @@ interface FolderProps {
 function FolderPage({ folder, onBack, onError }: FolderProps) {
     const [elements, setElements] = useState<DownloadTrackElement[]>([]);
     const [isLoading, setIsLoading] = useState(false);
+    const [localFiles, setLocalFiles] = useState<LocalTrack[]>([]);
 
     const spotifyElements = useMemo(() => elements.filter(el => el instanceof SpotifyTrackElement) as SpotifyTrackElement[], [elements]);
     const orphanElements = useMemo(() => elements.filter(el => el instanceof OrphanFileElement) as OrphanFileElement[], [elements]);
 
-    const initializeElements = (tracks = folder.tracks, localFiles: LocalTrack[] = []) => {
-        const localFileNames = new Set(localFiles.map(f => f.name.toLowerCase()));
+    const initializeElements = (
+        tracks = folder.tracks, 
+        files = localFiles, 
+        youtubeTracks?: (YoutubeTrack | undefined)[]
+    ) => {
+        const localFileNames = new Set(files.map(f => f.name.toLowerCase()));
         const matchedLocalNames = new Set<string>();
 
-        const spotifyElements = tracks.map(track => {
-            const safeName = getSafeName(track.title).toLowerCase();
+        // Check if we have YouTube results loaded (either passed now or existing)
+        const hasYoutube = youtubeTracks !== undefined || elements.some(el => el instanceof SpotifyTrackElement && el.youtubeTrack);
+
+        const spotifyElements = tracks.map((track, idx) => {
             const element = new SpotifyTrackElement(track);
             
-            if (localFileNames.has(safeName)) {
+            // Find if there's already a YouTube track assigned to this Spotify track
+            const existingElement = elements.find(
+                (el): el is SpotifyTrackElement => 
+                    el instanceof SpotifyTrackElement && 
+                    el.track.title === track.title && 
+                    el.track.name === track.name
+            );
+            const ytTrack = youtubeTracks ? youtubeTracks[idx] : existingElement?.youtubeTrack;
+            
+            if (ytTrack) {
+                element.youtubeTrack = ytTrack;
+            }
+
+            const spotifySafeName = getSafeName(track.title).toLowerCase();
+            const ytSafeName = ytTrack ? getSafeName(ytTrack.title).toLowerCase() : "";
+
+            let isDownloaded = false;
+            if (localFileNames.has(spotifySafeName)) {
+                isDownloaded = true;
+                matchedLocalNames.add(spotifySafeName);
+            }
+            if (ytSafeName && localFileNames.has(ytSafeName)) {
+                isDownloaded = true;
+                matchedLocalNames.add(ytSafeName.toLocaleLowerCase());
+            }
+
+            if (isDownloaded) {
                 element.status = DownloadTrackStatus.Downloaded;
                 element.action = DownloadTrackAction.NotDownload;
-                matchedLocalNames.add(safeName);
+            } else {
+                element.status = DownloadTrackStatus.NotDownloaded;
+                element.action = DownloadTrackAction.Download;
             }
             
             return element;
         });
 
-        const orphanElements = localFiles
-            .filter(f => !matchedLocalNames.has(f.name.toLowerCase()))
-            .map(f => new OrphanFileElement(f.name));
+        // Orphans are only populated and shown if YouTube tracks have been loaded
+        const orphanElements = hasYoutube
+            ? files
+                .filter(f => !matchedLocalNames.has(f.name.toLowerCase()))
+                .map(f => new OrphanFileElement(f.name))
+            : [];
 
         setElements([...spotifyElements, ...orphanElements]);
     };
@@ -59,8 +97,9 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
                 if (folder.tracks.length === 0) {
                     await folder.loadTracks();
                 }
-                const localFiles = await invoke<LocalTrack[]>("list_files", { folderPath: folder.path });
-                initializeElements(folder.tracks, localFiles);
+                const files = await invoke<LocalTrack[]>("list_files", { folderPath: folder.path });
+                setLocalFiles(files);
+                initializeElements(folder.tracks, files);
             } catch (err) {
                 onError(String(err));
             } finally {
@@ -75,14 +114,7 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
             setIsLoading(true);
             invoke<YoutubeTrack[]>("get_playlist_youtube_tracks", { tracks: spotifyElements.map(e => e.track) })
                 .then((youtubeTracks) => {
-                    const updatedElements = elements.map((el) => {
-                        if (el instanceof SpotifyTrackElement) {
-                            const spotifyIdx = spotifyElements.indexOf(el);
-                            el.youtubeTrack = youtubeTracks[spotifyIdx];
-                        }
-                        return el;
-                    });
-                    setElements([...updatedElements]);
+                    initializeElements(folder.tracks, localFiles, youtubeTracks);
                 }).catch(err => {
                     onError(String(err));
                 }).finally(() => {
@@ -96,8 +128,9 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
         Promise.all([
             folder.loadTracks(),
             invoke<LocalTrack[]>("list_files", { folderPath: folder.path })
-        ]).then(([_, localFiles]) => {
-            initializeElements(folder.tracks, localFiles);
+        ]).then(([_, files]) => {
+            setLocalFiles(files);
+            initializeElements(folder.tracks, files);
         }).catch((err) => {
             onError(String(err));
         }).finally(() => {
@@ -119,10 +152,11 @@ function FolderPage({ folder, onBack, onError }: FolderProps) {
                     url: el.youtubeTrack!.url, 
                     folderPath: folder.path 
                 });
-                el.status = DownloadTrackStatus.Downloaded;
-                el.action = DownloadTrackAction.NotDownload;
             }
-            setElements([...elements]);
+            const files = await invoke<LocalTrack[]>("list_files", { folderPath: folder.path });
+            setLocalFiles(files);
+            const currentYoutubeTracks = spotifyElements.map(e => e.youtubeTrack);
+            initializeElements(folder.tracks, files, currentYoutubeTracks);
         } catch (err) {
             onError(String(err));
         } finally {

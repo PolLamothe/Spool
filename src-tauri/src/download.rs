@@ -63,11 +63,20 @@ pub fn is_video_downloaded(title: String, folder_path: String) -> bool {
 }
 
 #[tauri::command]
-pub async fn download_video(url: String, folder_path: String) -> Result<String, String> {
+pub async fn download_video(app_handle: tauri::AppHandle, url: String, folder_path: String) -> Result<String, String> {
+    let config = crate::config::load_config(&app_handle);
+
     // 1. Get video title using yt-dlp
-    let output = Command::new("yt-dlp")
-        .args(["--get-title", &url])
-        .output()
+    let mut title_cmd = Command::new("yt-dlp");
+    title_cmd.arg("--get-title");
+    if let Some(ref browser) = config.youtube_cookies_browser {
+        if !browser.is_empty() && browser != "none" {
+            title_cmd.args(["--cookies-from-browser", browser]);
+        }
+    }
+    title_cmd.arg(&url);
+
+    let output = title_cmd.output()
         .await
         .map_err(|e| format!("Failed to execute yt-dlp to get title: {}", e))?;
 
@@ -86,14 +95,20 @@ pub async fn download_video(url: String, folder_path: String) -> Result<String, 
     }
 
     // 3. Download using yt-dlp
-    let download_output = Command::new("yt-dlp")
-        .args([
-            "-x", 
-            "--audio-format", "m4a",
-            "--output", dest_path.to_str().ok_or("Invalid destination path")?,
-            &url
-        ])
-        .output()
+    let mut download_cmd = Command::new("yt-dlp");
+    download_cmd.args([
+        "-x", 
+        "--audio-format", "m4a",
+        "--output", dest_path.to_str().ok_or("Invalid destination path")?,
+    ]);
+    if let Some(ref browser) = config.youtube_cookies_browser {
+        if !browser.is_empty() && browser != "none" {
+            download_cmd.args(["--cookies-from-browser", browser]);
+        }
+    }
+    download_cmd.arg(&url);
+
+    let download_output = download_cmd.output()
         .await
         .map_err(|e| format!("Failed to execute yt-dlp: {}", e))?;
 

@@ -9,7 +9,8 @@ use rspotify::Token;
 pub struct AppConfig {
     folders: Vec<Folder>,
     pub client : Option<ClientConfig>,
-    pub token : Option<Token>
+    pub token : Option<Token>,
+    pub youtube_cookies_browser: Option<String>,
 }
 
 #[derive(Serialize, Deserialize, Clone, Debug)]
@@ -48,7 +49,8 @@ pub fn load_config(app_handle: &tauri::AppHandle) -> AppConfig {
     let default_config = AppConfig { 
         folders: Vec::new(),
         client : None,
-        token : None
+        token : None,
+        youtube_cookies_browser: None,
     };
 
     if let Ok(config_path) = get_config_file_path(&app_handle) {
@@ -134,4 +136,17 @@ pub fn set_token(app_handle: tauri::AppHandle, token: Option<Token>) -> Result<(
 pub fn get_token(app_handle: tauri::AppHandle) -> Option<Token> {
     let config = load_config(&app_handle);
     config.token
+}
+
+#[tauri::command]
+pub fn set_youtube_cookies_browser(app_handle: tauri::AppHandle, browser: Option<String>) -> Result<(), String> {
+    let mut config = load_config(&app_handle);
+    config.youtube_cookies_browser = browser;
+    save_config(&app_handle, &config)
+}
+
+#[tauri::command]
+pub fn get_youtube_cookies_browser(app_handle: tauri::AppHandle) -> Option<String> {
+    let config = load_config(&app_handle);
+    config.youtube_cookies_browser
 }

@@ -80,6 +80,11 @@ For many DJs, Spotify is the ultimate discovery tool, but using those tracks in 
    - Spool will automatically load the tracklist from Spotify.
    - Click **Load YouTube Tracks** to start the matching process. Spool will search for the best YouTube video match for each Spotify track, preparing them for future download.
 
+5. **Bypassing Age Restrictions (YouTube Cookies):**
+   - If you encounter download errors related to age restriction or bot detection (e.g., `yt-dlp failed to get title: ERROR: Sign in to confirm your age`), navigate to the **Settings** page.
+   - Under **YouTube Downloader Settings**, select the web browser you use to watch YouTube (e.g., Google Chrome, Firefox, Safari) from the **Cookies Source Browser** dropdown.
+   - Spool will automatically extract your YouTube session cookies from that browser to authenticate your download requests.
+
 ## 🏗️ Project Structure
 
 - `src/`: React frontend source code.
