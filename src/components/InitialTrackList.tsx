@@ -1,19 +1,16 @@
 import { 
-    DownloadTrackElement, 
-    DownloadTrackStatus 
+    DownloadTrackElement 
 } from "../structures";
 import { TrackRow } from "./TrackRow";
 
 interface InitialTrackListProps {
     elements: DownloadTrackElement[];
     onToggleAction: (index: number) => void;
-    getStatusClass: (status: DownloadTrackStatus) => string;
 }
 
 export function InitialTrackList({ 
     elements, 
-    onToggleAction, 
-    getStatusClass 
+    onToggleAction 
 }: InitialTrackListProps) {
     return (
         <table className="track-table">
@@ -33,7 +30,6 @@ export function InitialTrackList({
                         index={index}
                         hasYoutubeResults={false}
                         onToggleAction={onToggleAction}
-                        getStatusClass={getStatusClass}
                     />
                 ))}
             </tbody>

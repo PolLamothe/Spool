@@ -11,9 +11,17 @@ interface TrackRowProps {
     index: number;
     hasYoutubeResults: boolean;
     onToggleAction: (index: number) => void;
-    getStatusClass: (status: DownloadTrackStatus) => string;
     hideYoutubeColumn?: boolean;
 }
+
+const getStatusClass = (status: DownloadTrackStatus) => {
+    switch (status) {
+        case DownloadTrackStatus.Downloaded: return "status-downloaded";
+        case DownloadTrackStatus.NotDownloaded: return "status-not-downloaded";
+        case DownloadTrackStatus.NotInPlaylist: return "status-not-in-playlist";
+        default: return "status-not-downloaded";
+    }
+};
 
 /**
  * Sub-component for a single track row
@@ -23,7 +31,6 @@ export function TrackRow({
     index, 
     hasYoutubeResults, 
     onToggleAction,
-    getStatusClass,
     hideYoutubeColumn = false
 }: TrackRowProps) {
     const isSpotify = el instanceof SpotifyTrackElement;

@@ -1,26 +1,22 @@
+import { useMemo } from "react";
 import { 
     DownloadTrackElement, 
     SpotifyTrackElement, 
-    OrphanFileElement, 
-    DownloadTrackStatus 
+    OrphanFileElement 
 } from "../structures";
 import { TrackRow } from "./TrackRow";
 
 interface YoutubeTrackListProps {
     elements: DownloadTrackElement[];
-    spotifyElements: SpotifyTrackElement[];
-    orphanElements: OrphanFileElement[];
     onToggleAction: (index: number) => void;
-    getStatusClass: (status: DownloadTrackStatus) => string;
 }
 
 export function YoutubeTrackList({ 
     elements, 
-    spotifyElements, 
-    orphanElements, 
-    onToggleAction, 
-    getStatusClass 
+    onToggleAction 
 }: YoutubeTrackListProps) {
+    const spotifyElements = useMemo(() => elements.filter(el => el instanceof SpotifyTrackElement) as SpotifyTrackElement[], [elements]);
+    const orphanElements = useMemo(() => elements.filter(el => el instanceof OrphanFileElement) as OrphanFileElement[], [elements]);
     return (
         <>
             <table className="track-table">
@@ -43,7 +39,6 @@ export function YoutubeTrackList({
                                 index={originalIndex}
                                 hasYoutubeResults={true}
                                 onToggleAction={onToggleAction}
-                                getStatusClass={getStatusClass}
                             />
                         );
                     })}
@@ -80,7 +75,6 @@ export function YoutubeTrackList({
                                         hasYoutubeResults={true}
                                         hideYoutubeColumn={true}
                                         onToggleAction={onToggleAction}
-                                        getStatusClass={getStatusClass}
                                     />
                                 );
                             })}

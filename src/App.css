@@ -362,23 +362,27 @@ button.secondary-btn:disabled {
 
 /* Scrollbar styles */
 .playlists-preview-container::-webkit-scrollbar,
-.track-list-container::-webkit-scrollbar {
+.track-list-container::-webkit-scrollbar,
+.scrollable-page::-webkit-scrollbar {
   width: 8px;
 }
 
 .playlists-preview-container::-webkit-scrollbar-track,
-.track-list-container::-webkit-scrollbar-track {
+.track-list-container::-webkit-scrollbar-track,
+.scrollable-page::-webkit-scrollbar-track {
   background: transparent;
 }
 
 .playlists-preview-container::-webkit-scrollbar-thumb,
-.track-list-container::-webkit-scrollbar-thumb {
-  background: var(--bg-primary);
+.track-list-container::-webkit-scrollbar-thumb,
+.scrollable-page::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
   border-radius: 4px;
 }
 
 .playlists-preview-container::-webkit-scrollbar-thumb:hover,
-.track-list-container::-webkit-scrollbar-thumb:hover {
+.track-list-container::-webkit-scrollbar-thumb:hover,
+.scrollable-page::-webkit-scrollbar-thumb:hover {
   background: rgba(255, 255, 255, 0.1);
 }
 
@@ -716,4 +720,12 @@ input:checked + .slider:before {
 .cookies-select:focus {
   border-color: var(--accent-color);
   outline: 1px solid var(--accent-color);
+}
+
+/* Scrollable Page layout */
+.scrollable-page {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  padding-right: 0.5rem;
 }
